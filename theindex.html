@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Web3 Login process with MetaMask</title>
+        <script src="https://cdn.ethers.io/lib/ethers-5.6.4.umd.min.js" type="application/javascript"></script>
+        <script>
+            function web3_check_metamask() {
+                if (!window.ethereum) {
+                    console.error('METAMASK EXT INSTALL NOT DETECTED .');
+                    alert('mETAMASK EXT INSTALL NOT DETECTED');
+                    return false;
+                }else{
+                    console.log('MetaMask EXT INSTALL DETECTED');
+                    return true;
+                }
+            }
+            
+            function web3_metamask_hash(){
+                var hashed_string   = '';
+                var chars           = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+                var total_chars     = chars.length;
+                for ( var i = 0; i <= 255; i++ ) {
+                    hashed_string += chars.charAt(Math.floor(Math.random() * total_chars));
+                }
+                return hashed_string;                
+            }
+            
+            async function web3_metamask_login() {
+                // Check first
+                if ( web3_check_metamask() ) {
+                    console.log('Started the Login Process');
+
+                    // Get the Ethereum provider
+                    const provider = new ethers.providers.Web3Provider(window.ethereum);                    
+                    // Get Ethereum accounts
+                    await provider.send("eth_requestAccounts", []);
+                    console.log("Coonnect to account"); 
+                    // Get the User Ethereum address
+                    const addr = await provider.getSigner().getAddress();
+                    console.log(addr);      
+
+                    // Create hashed string 
+                    const hashed_string = web3_metamask_hash();      
+                    //console.log("Hashed string: " + hashed_string);   
+                    // Request the user to sign it
+                    const thesig = await provider.getSigner().signMessage(hashed_string);
+                    // Got the signature
+                    console.log("Signature is:" + thesig);   
+
+                    // TODO
+                    // you can then send the signature to the webserver for further processing and verification 
+                }
+            }              
+        </script>
+    </head>
+    <body>
+        <p>MetaMask installation check- see console output: <a href="#!" onclick="web3_check_metamask();">Detect MetaMask</a></p>
+        <p>Click below to log into your Metamask  : <a href="#!" onclick="web3_metamask_login();">Login into MetaMask</a></p>
+    </body>
+</html>
